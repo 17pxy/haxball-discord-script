@@ -23,8 +23,10 @@ Podras tener un bot de discord y tu script de haxball conectados entre si para p
 - Sistema de tienda (Podras comprar cosas usando coins, rangos (Vip, Premium), poderes( Powershot, todoschiquitos, size ), comandos ( setprefix, size, setchatcolor )
 - Sistema de poderes ( Powershot, todoschiquitos, size)
 - Sistema de blacklist
+- Sistema de autenticacion por nick
 - Comando claimcoins (Permite reclamar coins a usuarios que vinculen su cuenta de discord con haxball y recien comienzan en el host)
 - Comandos ban, mute, chatlock, chatunlock, coinspay, llamaradmin
+- Comando cambiar-auth y cambiar-nick (Para evitar perder cuenta)
 - Admin chat
 - Team chat
 - Anuncios desde discord
