@@ -1,0 +1,82 @@
+# ----------------------------------------------------
+# Haxball Bot 1.0.1 Configuration File
+# Haxball Nick: rana
+# Discord: @17pxy
+# QUEDA TOTALMENTE PROHIBIDA LA VENTA DE ESTE SCRIPT
+# MANTENER CREDITOS AL CREADOR
+# ----------------------------------------------------
+
+##########################################
+#                 GENERAL                #
+##########################################
+
+# BOT PREFIX
+PREFIX: "h!"
+
+# BOTNAME
+BOTNAME: "Haxball Bot"
+
+# EMBEDCOLOR | 
+EMBEDCOLOR: "GREEN"
+
+# OWNER-NAME | 
+OWNERNAME: "17pxy (rana)" # Discord username
+
+# OWNER-ID | 
+OWNERID: "852300860176597002" 
+
+# TOKEN | 
+TOKEN: 'TOKEN DE TU BOT DE DISCORD'
+
+# GUILD-ID | 
+GUILDID: 'ID DE TU SERVIDOR DE DISCORD'
+
+# DATABASE |
+mongooseConnectionString: 'MONGODB URI'
+
+##########################################
+#              Haxball Config            #
+##########################################
+
+HAXBALL: # CONFIGURACION DE HAXBALL
+  ROOM_NAME: "🐸⚽ CREANDO SCRIPT PUBLICO ⚽🐸"
+  COMMUNITY_NAME: "COMUNIDAD HAXBALL"
+  DISCORD_NAME: "[JUEGAN_TODOS]"
+  TOKEN: "thr1.AAAAAGVEA_sUqasoHwJ_dA.xZPWyGf7M6s"
+  MAX_USERS: 24
+  PUBLIC: true
+  BOT_NO_PLAYER: true
+  MODE: "JUEGAN_TODOS" # JUEGAN_TODOS
+  HOST_FULL_PASS: "example123"
+  MAX_SLOTS: 20 # MAX SLOTS SET PASSWORD
+  MIN_PLAYERS_FOR_STATS: 8
+  SCORE_LIMIT: 5
+  TIME_LIMIT: 10
+  DISCORD: "https://discord.gg/yUjWx4BPKA"
+CHANNELS: # CANALES PARA REGISTROS
+  IP_LOGS: ""
+  NICKNAME_LOGS: ""
+  PLAYER_LEAVE_LOGS: ""
+  BAN_LOGS: ""
+  LLAMAR_ADMIN: ""
+
+##########################################
+#             Activity Config            #
+##########################################
+
+ACTIVITY:
+  ACTIVITIES:  # Placeholders 
+    ACTIVITY1: "Haxball Bot"
+    ACTIVITY2: "Creado por rana"
+    ACTIVITY3: ".gg/haxballbot"
+    ACTIVITYTYPE1: "PLAYING"
+    ACTIVITYTYPE2: "WATCHING"
+    ACTIVITYTYPE3: "COMPETING"
+    STATUS: "DND"
+    INTERVAL: "3500" # ms
+
+##########################################
+#        Haxball Bot By rana (17pxy)    #
+#             Comunidad Haxball          #
+##########################################
+

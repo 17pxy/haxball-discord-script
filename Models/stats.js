@@ -1,0 +1,48 @@
+const mongoose = require('mongoose')
+
+const stats = new mongoose.Schema ({
+    auth: String, // TOKEN
+    conexion: String,
+    name: String,
+    id: Number,
+    registered: { type: Date, default: Date.now()},
+    discordID: { type: String, default: null },
+    claimedCoins: { type: Boolean, default: false },
+    isLogged: {type: Boolean, default: false},
+    isPlaying: {type: Boolean, default: false},
+    isAFK: { type: Boolean, default: false},
+    isBanned: { type: Boolean, default: false},
+    isBlacklisted: { type: Boolean, default: false},
+    isMuted: { type: Boolean, default: false},
+    isVIP: { type: Boolean, default: false},
+    vipPermanent: { type: Boolean, default: false},
+    premiumPermanent: { type: Boolean, default: false},
+    isPremium: { type: Boolean, default: false},
+    isUltimate: { type: Boolean, default: false },
+    coins: { type: Number, default: 0},
+    isAdminOFI: { type: Boolean, default: false},
+    warnings: { type: Number, default: 0},
+    adminLevel: { type: String, default: "ADMIN"},
+    partidos: {type: Number, default: 0},
+    ganados: {type: Number, default: 0},
+    perdidos: {type: Number, default: 0},
+    goles: {type: Number, default: 0},
+    asistencias: {type: Number, default: 0},
+    golesencontra: {type: Number, default: 0},
+    vallasinvictas: {type: Number, default: 0},
+    atajadas: {type: Number, default: 0},
+    salvadasepicas: {type: Number, default: 0},
+    puntaje: {type: Number, default: 0},
+    nivel: { type: Number, default: 1},
+    size: { type: Number, default: 15},
+    chatColor: { type: Number, default: null},
+    sizeAccess: { type: Boolean, default: false},
+    chatColorAccess: { type: Boolean, default: false},
+    prefixAccess: { type: Boolean, default: false},
+    prefix: String,
+    poderGigante: { type: Boolean, default: false},
+    apuestaMonto: { type: Number, default: 0},
+    apuestaEquipo: { type: String, default: ""}
+})
+
+module.exports = mongoose.model('stats', stats)
