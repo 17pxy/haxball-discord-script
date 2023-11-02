@@ -1,6 +1,6 @@
 # Haxball-Discord-Script
 
-## 🇪🇸 ESPAÑOL
+## ESPAÑOL
 
 ## Description
 
@@ -38,7 +38,7 @@ Podras tener un bot de discord y tu script de haxball conectados entre si para p
 
 y mucho mas!
 
-## 🇺🇸 ENGLISH
+## ENGLISH
 
 ## Description
 
