@@ -14,6 +14,7 @@ const fs = require("fs");
 const express = require("express");
 const haxball = require("haxball.js");
 const statsDB = require("./Models/stats.js");
+const syncModel = require("./Models/syncModel.js");
 const config = yaml.load(fs.readFileSync("settings/config.yml", "utf8", 2));
 
 client.commands = new Collection();
@@ -712,7 +713,7 @@ haxball.then(async (HBInit) => {
             `El usuario ${player.name} vinculó su cuenta de discord con haxball!`,
             null,
             0x4dff15,
-            bold,
+            "bold",
             1
           );
       } else if (args[0] == "blacklist" && player.admin && args.length >= 2) {
