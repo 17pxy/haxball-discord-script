@@ -13,8 +13,11 @@ const yaml = require("js-yaml");
 const fs = require("fs");
 const express = require("express");
 const haxball = require("haxball.js");
+
 const statsDB = require("./Models/stats.js");
 const syncModel = require("./Models/syncModel.js");
+const poderesDB = require("./Models/poderes.js");
+
 const config = yaml.load(fs.readFileSync("settings/config.yml", "utf8", 2));
 
 client.commands = new Collection();
