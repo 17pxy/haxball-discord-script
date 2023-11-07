@@ -304,6 +304,16 @@ haxball.then(async (HBInit) => {
 
   };
 
+  room.onPlayerBallKick = async function (player) {
+    secondLastKickerId = lastKickerId;
+    secondLastKickerName = lastKickerName;
+    secondLastKickerTeam = lastKickerTeam;
+   
+    lastKickerId = player.id;
+    lastKickerName = player.name;
+    lastKickerTeam = player.team;
+  }
+
   room.onTeamGoal = async function (team) {
     const userStats = await statsDB.findOne({ name: lastKickerName });
     const assistStats = await statsDB.findOne({ name: secondLastKickerName });
