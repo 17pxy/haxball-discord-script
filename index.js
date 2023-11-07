@@ -42,6 +42,14 @@ var futsalx4 = `{"name":"Futsal x4","width":765,"height":350,"bg":{"color":"2B59
 const app = express();
 app.use(express.json());
 
+var levels = []
+var pointsLevel = 10;
+var totalLevels = 50;
+
+for (var i = 2; i <= totalLevels; i++) {
+  levels.push({level: i, points: pointsLevel * i});
+}
+
 haxball.then(async (HBInit) => {
   const geo = [
     { code: "ly", lat: -34.49999999999999, lon: -58.299999999999996 },
