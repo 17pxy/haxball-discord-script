@@ -1818,10 +1818,9 @@ haxball.then(async (HBInit) => {
             }, 25000);
           }
       } 
-      return false;
     }
     commands();
-    
+    return false;
     } else if (msg.startsWith("-") && player.admin) {
       let args = msg.split(" ");
       let messageAdmin = args.slice(1).join(" ");
