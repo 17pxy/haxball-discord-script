@@ -1,10 +1,12 @@
 # Haxball-Discord-Script
-
 ## ESPAÑOL
 
 ## Description
 
 Este proyecto es un script de Haxball conectado a un bot de Discord, diseñado para mejorar la experiencia de juego y la interacción en Haxball. El script implementa una serie de funciones que permiten a los jugadores personalizar su experiencia de juego y facilitar la coordinación y comunicación entre los usuarios a través de Discord.
+
+## Ahora podes implementar Haxball Dashboard junto al script Haxball Discord Script:
+https://github.com/17pxy/haxball-dashboard
 
 ## Como Usar
 
