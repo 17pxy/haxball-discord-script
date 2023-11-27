@@ -337,11 +337,12 @@ haxball.then(async (HBInit) => {
     players = room.getPlayerList();
     scoresRed = scoresRed + room.getScores().red;
     scoresBlue = scoresBlue + room.getScores().blue;
+    tiempo = secondsToMinutes(Math.floor(room.getScores().time));
 
     if (team == 1) {
       if (lastKickerTeam == 2) {
         room.sendAnnouncement(
-          `🔴 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] tiempo - 🟥 ${room.getScores().red
+          `🔴 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -361,7 +362,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam != secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔴 GOOOOL! - ${lastKickerName} [⚽] tiempo - 🟥 ${room.getScores().red
+          `🔴 GOOOOL! - ${lastKickerName} [⚽] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -380,7 +381,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam == secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔴 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] tiempo - 🟥 ${room.getScores().red
+          `🔴 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -416,7 +417,7 @@ haxball.then(async (HBInit) => {
     } else if (team == 2) {
       if (lastKickerTeam == 1) {
         room.sendAnnouncement(
-          `🔵 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] tiempo - 🟥 ${room.getScores().red
+          `🔵 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -436,7 +437,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam != secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔵 GOOOOL! - ${lastKickerName} [⚽] tiempo - 🟥 ${room.getScores().red
+          `🔵 GOOOOL! - ${lastKickerName} [⚽] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -456,7 +457,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam == secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔵 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] tiempo - 🟥 ${room.getScores().red
+          `🔵 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -2603,6 +2604,21 @@ haxball.then(async (HBInit) => {
       0
     );
   }
+
+  function secondsToMinutes(time) {
+    var hrs = ~~(time / 3600);
+    var mins = ~~((time % 3600) / 60);
+    var secs = ~~time % 60;
+
+    var ret = "";
+    if (hrs > 0) {
+      ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+    }
+    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+    ret += "" + secs;
+    return ret;
+  }
+
 });
 
 client.login(config.TOKEN);
