@@ -53,12 +53,12 @@ HAXBALL: # CONFIGURACION DE HAXBALL
   SCORE_LIMIT: 5
   TIME_LIMIT: 10
   DISCORD: "https://discord.gg/yUjWx4BPKA"
-CHANNELS: # CANALES PARA REGISTROS
-  IP_LOGS: ""
-  NICKNAME_LOGS: ""
-  PLAYER_LEAVE_LOGS: ""
-  BAN_LOGS: ""
-  LLAMAR_ADMIN: ""
+  CHANNELS: # CANALES PARA REGISTROS
+    IP_LOGS: ""
+    NICKNAME_LOGS: ""
+    PLAYER_LEAVE_LOGS: ""
+    BAN_LOGS: ""
+    LLAMAR_ADMIN: ""
 
 ##########################################
 #             Activity Config            #
