@@ -10,9 +10,7 @@ https://github.com/17pxy/haxball-dashboard
 
 ## Como Usar
 
-- Instalar dependencias.
-- Rellenar config.yml.
-- Iniciar script.
+- https://www.youtube.com/watch?v=DLoITrtygOc&ab_channel=17pxy
 
 Para soporte unite al discord: https://discord.gg/mPxVtFfHE9
 
