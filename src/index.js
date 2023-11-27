@@ -319,6 +319,7 @@ haxball.then(async (HBInit) => {
       room.setPassword(null);
     }
 
+    playersInfo = playersInfo.filter(info => info.id !== player.id);
   };
 
   room.onPlayerBallKick = async function (player) {
@@ -2380,15 +2381,14 @@ haxball.then(async (HBInit) => {
   room.onGameTick = function () {
     checkIfAfk();
   }
-  
+
   function checkIfAfk() {
     const AFK_KICK_TIME = 30 * 1000; // A los 30 segundos lo kickea
     const AFK_WARNING_TIME = 15 * 1000 // A los 15 segundos da un aviso 
     const now = Date.now();
     playersInfo.forEach(player => {
       const playerObj = room.getPlayer(player.id)
-
-      if (playerObj.team === 0) return;
+      if (playerObj !== null && playerObj.team === 0) return;
 
       if (Math.abs(player.playerActivity - now) > AFK_KICK_TIME) {
         room.kickPlayer(player.id, `Fuiste kickeado por AFK.`);
