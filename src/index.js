@@ -47,7 +47,7 @@ var pointsLevel = 10;
 var totalLevels = 50;
 
 for (var i = 2; i <= totalLevels; i++) {
-  levels.push({level: i, points: pointsLevel * i});
+  levels.push({ level: i, points: pointsLevel * i });
 }
 
 haxball.then(async (HBInit) => {
@@ -83,6 +83,7 @@ haxball.then(async (HBInit) => {
   let players = room.getPlayerList();
   let playerNames = players.map((x) => x.name);
   let playerIDS = players.map((x) => x.id);
+  var playersInfo = [];
 
   let playerDate = playerNames
     .map((nombre, i) => `${nombre}[${playerIDS[i]}]`)
@@ -190,36 +191,36 @@ haxball.then(async (HBInit) => {
 
     if (allBlacklisted.some(x => x.auth === player.auth || x.conexion === player.conn)) {
       return room.kickPlayer(player.id, "Usuario blacklisteado", true);
-    }    
+    }
 
     const playerData = await statsDB.findOne({ auth: player.auth, name: player.name });
     const checkName = await statsDB.findOne({ name: player.name });
-    
+
     if (checkName && checkName.auth !== player.auth) {
       return room.kickPlayer(player.id, "Este nick ya esta registrado en otra persona!", false);
     } else if (playerData?.isAdminOFI) {
       room.setPlayerAdmin(player.id, true);
     }
-    
+
 
     if (!playerData && !checkName) {
-        await statsDB.create({
-          auth: player.auth,
-          conexion: player.conn,
-          name: player.name,
-          id: player.id,
-          isLogged: true,
-          isPlaying: true,
-        });
-        players = room.getPlayerList();
-        reds = players.filter((x) => x.team == 1);
-        blues = players.filter((x) => x.team == 2);
-        spectators = players.filter((x) => x.team == 0);
-        if (reds.length <= blues.length) {
-          room.setPlayerTeam(player.id, 1);
-        } else {
-          room.setPlayerTeam(player.id, 2);
-        }
+      await statsDB.create({
+        auth: player.auth,
+        conexion: player.conn,
+        name: player.name,
+        id: player.id,
+        isLogged: true,
+        isPlaying: true,
+      });
+      players = room.getPlayerList();
+      reds = players.filter((x) => x.team == 1);
+      blues = players.filter((x) => x.team == 2);
+      spectators = players.filter((x) => x.team == 0);
+      if (reds.length <= blues.length) {
+        room.setPlayerTeam(player.id, 1);
+      } else {
+        room.setPlayerTeam(player.id, 2);
+      }
     }
 
     if (playerData?.isVIP) {
@@ -287,7 +288,15 @@ haxball.then(async (HBInit) => {
       } else {
         room.setPlayerTeam(player.id, 2);
       }
-    } 
+    }
+    playersInfo.push({
+      id: player.id,
+      playerActivity: Date.now(),
+      warned: false
+    })
+    if (players.length === 1) {
+      room.startGame();
+    }
   };
 
   room.onPlayerLeave = async function (player) {
@@ -316,7 +325,7 @@ haxball.then(async (HBInit) => {
     secondLastKickerId = lastKickerId;
     secondLastKickerName = lastKickerName;
     secondLastKickerTeam = lastKickerTeam;
-   
+
     lastKickerId = player.id;
     lastKickerName = player.name;
     lastKickerTeam = player.team;
@@ -328,12 +337,12 @@ haxball.then(async (HBInit) => {
     players = room.getPlayerList();
     scoresRed = scoresRed + room.getScores().red;
     scoresBlue = scoresBlue + room.getScores().blue;
+    tiempo = secondsToMinutes(Math.floor(room.getScores().time));
 
     if (team == 1) {
       if (lastKickerTeam == 2) {
         room.sendAnnouncement(
-          `🔴 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] tiempo - 🟥 ${
-            room.getScores().red
+          `🔴 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -353,8 +362,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam != secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔴 GOOOOL! - ${lastKickerName} [⚽] tiempo - 🟥 ${
-            room.getScores().red
+          `🔴 GOOOOL! - ${lastKickerName} [⚽] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -373,8 +381,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam == secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔴 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] tiempo - 🟥 ${
-            room.getScores().red
+          `🔴 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -410,8 +417,7 @@ haxball.then(async (HBInit) => {
     } else if (team == 2) {
       if (lastKickerTeam == 1) {
         room.sendAnnouncement(
-          `🔵 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] tiempo - 🟥 ${
-            room.getScores().red
+          `🔵 NOOO PARA EL OTRO LADO! - ${lastKickerName} [🤡] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -431,8 +437,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam != secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔵 GOOOOL! - ${lastKickerName} [⚽] tiempo - 🟥 ${
-            room.getScores().red
+          `🔵 GOOOOL! - ${lastKickerName} [⚽] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -452,8 +457,7 @@ haxball.then(async (HBInit) => {
         lastKickerTeam == secondLastKickerTeam
       ) {
         room.sendAnnouncement(
-          `🔵 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] tiempo - 🟥 ${
-            room.getScores().red
+          `🔵 GOOOOL! - ${lastKickerName} [⚽]  ${secondLastKickerName} [👟] ${tiempo} - 🟥 ${room.getScores().red
           } - ${room.getScores().blue} 🟦`,
           null,
           0xffff38,
@@ -656,11 +660,11 @@ haxball.then(async (HBInit) => {
             players[j] = temp;
           }
 
-          var team = 1; 
+          var team = 1;
           setTimeout(() => {
             players.forEach(function (player) {
-              room.setPlayerTeam(player.id, team); 
-              team = team === 1 ? 2 : 1; 
+              room.setPlayerTeam(player.id, team);
+              team = team === 1 ? 2 : 1;
             });
             room.startGame();
           }, 1000);
@@ -710,12 +714,12 @@ haxball.then(async (HBInit) => {
   room.onPlayerChat = function (player, msg) {
 
     if (msg.startsWith("!")) {
-      async function commands(){
-      msg = msg.substr(1);
-      let args = msg.split(" ");
-      args[0] = args[0].toLowerCase();
+      async function commands() {
+        msg = msg.substr(1);
+        let args = msg.split(" ");
+        args[0] = args[0].toLowerCase();
 
-      if (args[0] == "discordsync" && args.length >= 2) {
+        if (args[0] == "discordsync" && args.length >= 2) {
           const code = args[1];
           const checkCode = await syncModel.findOne({ code: code });
           if (!checkCode) return;
@@ -737,7 +741,7 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "blacklist" && player.admin && args.length >= 2) {
+        } else if (args[0] == "blacklist" && player.admin && args.length >= 2) {
           let usuario = args.slice(1).join(" ");
           const userData = await statsDB.findOne({ name: usuario });
 
@@ -776,7 +780,7 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "unban" && player.admin && args.length >= 2) {
+        } else if (args[0] == "unban" && player.admin && args.length >= 2) {
           let usuario = args.slice(1).join(" ");
           const userData = await statsDB.findOne({ name: usuario });
 
@@ -811,7 +815,7 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "bans" && player.admin) {
+        } else if (args[0] == "bans" && player.admin) {
           const allBans = await statsDB.find({ isBanned: true });
           sendAnnounce(
             `[🤓 Lista de baneados] ${allBans
@@ -822,34 +826,34 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "me") {
-        sendStats(player.name, player.id, null);
-      } else if (args[0] == "stats" && args.length >= 2) {
+        } else if (args[0] == "me") {
+          sendStats(player.name, player.id, null);
+        } else if (args[0] == "stats" && args.length >= 2) {
           let usuario = args.slice(1).join(" ");
           const userStats = await sendStats(usuario, player.id, player.name);
-      } else if (args[0] == "bb" || args[0] == "nv") {
-        room.kickPlayer(player.id, "Hasta pronto!", false);
-      } else if (args[0] == "autochoice" && player.admin) {
-        if (autoChoice) {
-          autoChoice = false;
-          sendAnnounce(
-            `[❗] ${player.name} desactivó el modo auto choice!`,
-            null,
-            0x89fc70,
-            "bold",
-            1
-          );
-        } else {
-          autoChoice = true;
-          sendAnnounce(
-            `[❗] ${player.name} activó el modo auto choice!`,
-            null,
-            0x89fc70,
-            "bold",
-            1
-          );
-        }
-      } else if (args[0] == "size") {
+        } else if (args[0] == "bb" || args[0] == "nv") {
+          room.kickPlayer(player.id, "Hasta pronto!", false);
+        } else if (args[0] == "autochoice" && player.admin) {
+          if (autoChoice) {
+            autoChoice = false;
+            sendAnnounce(
+              `[❗] ${player.name} desactivó el modo auto choice!`,
+              null,
+              0x89fc70,
+              "bold",
+              1
+            );
+          } else {
+            autoChoice = true;
+            sendAnnounce(
+              `[❗] ${player.name} activó el modo auto choice!`,
+              null,
+              0x89fc70,
+              "bold",
+              1
+            );
+          }
+        } else if (args[0] == "size") {
           const userData = await statsDB.findOne({ name: player.name });
           if (!userData.isVIP && !userData.sizeAccess) return false;
 
@@ -886,97 +890,97 @@ haxball.then(async (HBInit) => {
               { size: size }
             );
           }
-      } else if (args[0] == "help" || args[0] == "ayuda") {
-        if (!player.admin) {
+        } else if (args[0] == "help" || args[0] == "ayuda") {
+          if (!player.admin) {
+            sendAnnounce(
+              `Comandos de Usuario`,
+              player.id,
+              0x4dff15,
+              "small-bold",
+              1
+            );
+            sendAnnounce(
+              `┃ !stats, !me, !bb, !nv, !size, !estadio, !ds, !llamaradmin <razon>, !coins, !tienda, !comprar, !coinspay, !claimcoins, !poderes, !powershot, !gigante, !todoschiquitos`,
+              player.id,
+              0xffffff,
+              "small-bold",
+              1
+            );
+          } else {
+            sendAnnounce(
+              `  Comandos de Usuario`,
+              player.id,
+              0x4dff15,
+              "small-bold",
+              1
+            );
+            sendAnnounce(
+              `┃ !stats, !me, !bb, !nv, !size, !estadio, !ds, !llamaradmin <razon>, !coins, !tienda, !comprar, !coinspay, !claimcoins, !poderes, !powershot, !gigante, !todoschiquitos`,
+              player.id,
+              0xffffff,
+              "small-bold",
+              1
+            );
+            sendAnnounce(
+              `  Comandos de Administrador`,
+              player.id,
+              0x4dff15,
+              "small-bold",
+              1
+            );
+            sendAnnounce(
+              `┃ !ban, !unban, !mute, !unmute !blacklist, !setvip, !removevip, !advertir`,
+              player.id,
+              0xffffff,
+              "small-bold",
+              1
+            );
+          }
+        } else if (args[0] == "clearbans" && player.admin) {
+          room.clearBans();
           sendAnnounce(
-            `Comandos de Usuario`,
-            player.id,
+            `[❗] ${player.name} eliminó todos los baneos!`,
+            null,
             0x4dff15,
-            "small-bold",
+            "bold",
             1
           );
+        } else if (args[0] == "ds" || args[0] == "discord") {
           sendAnnounce(
-            `┃ !stats, !me, !bb, !nv, !size, !estadio, !ds, !llamaradmin <razon>, !coins, !tienda, !comprar, !coinspay, !claimcoins, !poderes, !powershot, !gigante, !todoschiquitos`,
+            `[❗] Nuestro discord es: https://discord.gg/6k4tTkexdD`,
             player.id,
-            0xffffff,
-            "small-bold",
+            0x5ca3f7,
+            "bold",
             1
           );
-        } else {
+        } else if (args[0] == "llamaradmin" && args.length > 2) {
+          const llamadaRazon = args.slice(1).join(" ");
+          client.channels.cache
+            .get(client.config.HAXBALL.CHANNELS.LLAMAR_ADMIN)
+            .send({
+              embeds: [
+                new MessageEmbed()
+                  .setColor("ORANGE")
+                  .setTitle("ALERTA")
+                  .setDescription(
+                    `El usuario **${player.name}** uso el comando !llamaradmin.\nRazón: **${llamadaRazon}**\nHost: **${config.HAXBALL.ROOM_NAME}**`
+                  ),
+              ],
+            });
           sendAnnounce(
-            `  Comandos de Usuario`,
+            `Se llamo a un admin correctamente!`,
             player.id,
-            0x4dff15,
-            "small-bold",
+            0x5ca3f7,
+            "bold",
             1
           );
-          sendAnnounce(
-            `┃ !stats, !me, !bb, !nv, !size, !estadio, !ds, !llamaradmin <razon>, !coins, !tienda, !comprar, !coinspay, !claimcoins, !poderes, !powershot, !gigante, !todoschiquitos`,
-            player.id,
-            0xffffff,
-            "small-bold",
-            1
-          );
-          sendAnnounce(
-            `  Comandos de Administrador`,
-            player.id,
-            0x4dff15,
-            "small-bold",
-            1
-          );
-          sendAnnounce(
-            `┃ !ban, !unban, !mute, !unmute !blacklist, !setvip, !removevip, !advertir`,
-            player.id,
-            0xffffff,
-            "small-bold",
-            1
-          );
-        }
-      } else if (args[0] == "clearbans" && player.admin) {
-        room.clearBans();
-        sendAnnounce(
-          `[❗] ${player.name} eliminó todos los baneos!`,
-          null,
-          0x4dff15,
-          "bold",
-          1
-        );
-      } else if (args[0] == "ds" || args[0] == "discord") {
-        sendAnnounce(
-          `[❗] Nuestro discord es: https://discord.gg/6k4tTkexdD`,
-          player.id,
-          0x5ca3f7,
-          "bold",
-          1
-        );
-      } else if (args[0] == "llamaradmin" && args.length > 2) {
-        const llamadaRazon = args.slice(1).join(" ");
-        client.channels.cache
-          .get(client.config.HAXBALL.CHANNELS.LLAMAR_ADMIN)
-          .send({
-            embeds: [
-              new MessageEmbed()
-                .setColor("ORANGE")
-                .setTitle("ALERTA")
-                .setDescription(
-                  `El usuario **${player.name}** uso el comando !llamaradmin.\nRazón: **${llamadaRazon}**\nHost: **${config.HAXBALL.ROOM_NAME}**`
-                ),
-            ],
-          });
-        sendAnnounce(
-          `Se llamo a un admin correctamente!`,
-          player.id,
-          0x5ca3f7,
-          "bold",
-          1
-        );
-      } else if (args[0] == "mute" && args.length > 2 && player.admin) {
-        const muteUser = args.slice(1).join(" ");
-        setMute(muteUser, player.id);
-      } else if (args[0] == "unmute" && args.length > 2 && player.admin) {
-        const unmuteUser = args.slice(1).join(" ");
-        removeMute(unmuteUser, player.id);
-      } else if (args[0] == "advertir" && args.length > 1 && player.admin) {
+        } else if (args[0] == "mute" && args.length > 2 && player.admin) {
+          const muteUser = args.slice(1).join(" ");
+          setMute(muteUser, player.id);
+        } else if (args[0] == "unmute" && args.length > 2 && player.admin) {
+          const unmuteUser = args.slice(1).join(" ");
+          removeMute(unmuteUser, player.id);
+        } else if (args[0] == "advertir" && args.length > 1 && player.admin) {
           const warnUser = args.slice(1).join(" ");
 
           const warnData = await statsDB.findOne({ name: warnUser });
@@ -1049,7 +1053,7 @@ haxball.then(async (HBInit) => {
               );
             }
           }
-      } else if ( args[0] == "setvip" && args.length > 1 && player.admin ) {
+        } else if (args[0] == "setvip" && args.length > 1 && player.admin) {
           const vipUser = args.slice(1).join(" ");
           const vipData = await statsDB.findOne({ name: vipUser });
 
@@ -1072,8 +1076,8 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "removevip" && args.length > 1 && player.admin
-      ) {
+        } else if (args[0] == "removevip" && args.length > 1 && player.admin
+        ) {
           const vipUser = args.slice(1).join(" ");
 
           const vipData = await statsDB.findOne({ name: vipUser });
@@ -1106,7 +1110,7 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "coins") {
+        } else if (args[0] == "coins") {
           const coinsData = await statsDB.findOne({ name: player.name });
 
           sendAnnounce(
@@ -1116,92 +1120,91 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "tienda") {
-        sendAnnounce(
-          `🪙 Tienda de coins`,
-          player.id,
-          0x7cf9e8,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `Puedes comprar cualquiera de los siguientes comandos usando !comprar (size/chatcolor/vip/premium/setprefix/permavip/permapremium/gigante/powershot/todoschiquitos)`,
-          player.id,
-          0x7cf9e8,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・!size (100 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・!chatcolor (150 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(`・VIP (280 coins)`, player.id, 0xffffff, "small-bold", 1);
-        sendAnnounce(
-          `・!setprefix (300 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・Premium (380 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・Vip permanente (2000 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・Premium Permanente (3500 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・!gigante por 8 segundos (Poder 1 uso) (50 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・!powershot (Poder 1 uso) (70 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-        sendAnnounce(
-          `・!todoschiquitos (Poder 1 uso) (120 coins)`,
-          player.id,
-          0xffffff,
-          "small-bold",
-          1
-        );
-      } else if (args[0] == "poderes") {
+        } else if (args[0] == "tienda") {
+          sendAnnounce(
+            `🪙 Tienda de coins`,
+            player.id,
+            0x7cf9e8,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `Puedes comprar cualquiera de los siguientes comandos usando !comprar (size/chatcolor/vip/premium/setprefix/permavip/permapremium/gigante/powershot/todoschiquitos)`,
+            player.id,
+            0x7cf9e8,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・!size (100 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・!chatcolor (150 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(`・VIP (280 coins)`, player.id, 0xffffff, "small-bold", 1);
+          sendAnnounce(
+            `・!setprefix (300 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・Premium (380 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・Vip permanente (2000 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・Premium Permanente (3500 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・!gigante por 8 segundos (Poder 1 uso) (50 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・!powershot (Poder 1 uso) (70 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+          sendAnnounce(
+            `・!todoschiquitos (Poder 1 uso) (120 coins)`,
+            player.id,
+            0xffffff,
+            "small-bold",
+            1
+          );
+        } else if (args[0] == "poderes") {
           const poderesData = await poderesDB.findOne({ name: player.name });
 
           sendAnnounce(`🏹 PODERES`, player.id, 0x7cf9e8, "small-bold", 1);
           sendAnnounce(
-            `・Gigante: Te hace gigante durante 8 segundos, usos: (${
-              poderesData ? poderesData.gigante : 0
+            `・Gigante: Te hace gigante durante 8 segundos, usos: (${poderesData ? poderesData.gigante : 0
             }).`,
             player.id,
             0xffffff,
@@ -1209,8 +1212,7 @@ haxball.then(async (HBInit) => {
             1
           );
           sendAnnounce(
-            `・Powershot: Te da un tiro con mucha potencia durante 5 segundos, usos: (${
-              poderesData ? poderesData.power : 0
+            `・Powershot: Te da un tiro con mucha potencia durante 5 segundos, usos: (${poderesData ? poderesData.power : 0
             }).`,
             player.id,
             0xffffff,
@@ -1218,15 +1220,14 @@ haxball.then(async (HBInit) => {
             1
           );
           sendAnnounce(
-            `・Todos Chiquitos: Hace a todos los del equipo contrario chiquitos durante 15 segundos, usos: (${
-              poderesData ? poderesData.todosChiquitos : 0
+            `・Todos Chiquitos: Hace a todos los del equipo contrario chiquitos durante 15 segundos, usos: (${poderesData ? poderesData.todosChiquitos : 0
             }).`,
             player.id,
             0xffffff,
             "small-bold",
             1
           );
-      } else if (args[0] == "comprar") {
+        } else if (args[0] == "comprar") {
           let precioGigante = 25;
           let precioTodosChiquitos = 100;
           let PrecioPowerShot = 50;
@@ -1523,7 +1524,7 @@ haxball.then(async (HBInit) => {
 
               break;
           }
-      } else if (args[0] == "afk") {
+        } else if (args[0] == "afk") {
           const userUltimate = await statsDB.findOne({ name: player.name });
           if (userUltimate.isUltimate) {
             sendAnnounce(
@@ -1535,7 +1536,7 @@ haxball.then(async (HBInit) => {
             );
             room.setPlayerTeam(player.id, 0);
           }
-      } else if (args[0] == "setchatcolor" && args.length > 1) {
+        } else if (args[0] == "setchatcolor" && args.length > 1) {
           const statsUser = await statsDB.findOne({ name: player.name });
 
           if (!statsUser) return false;
@@ -1556,7 +1557,7 @@ haxball.then(async (HBInit) => {
             1
           );
 
-      } else if ( args[0] == "coinsgive" && args.length > 1 && player.admin && player.name == "rana") {
+        } else if (args[0] == "coinsgive" && args.length > 1 && player.admin && player.name == "rana") {
           const coinsAmount = parseInt(args[1]);
           const username = args.slice(2).join(" ");
 
@@ -1578,7 +1579,7 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (args[0] == "coinspay" && args.length > 1) {
+        } else if (args[0] == "coinspay" && args.length > 1) {
           const coinsAmount = parseInt(args[1]);
           if (coinsAmount <= 0) return;
           const username = args.slice(2).join(" ");
@@ -1616,23 +1617,23 @@ haxball.then(async (HBInit) => {
             "bold",
             1
           );
-      } else if (
-        args[0] == "iniciarsorteo" &&
-        args.length > 1 &&
-        player.admin
-      ) {
-        if (giveawayTime) return;
+        } else if (
+          args[0] == "iniciarsorteo" &&
+          args.length > 1 &&
+          player.admin
+        ) {
+          if (giveawayTime) return;
 
-        palabraSorteo = args[1];
-        giveawayTime = true;
+          palabraSorteo = args[1];
+          giveawayTime = true;
 
-        sendAnnounce(
-          `[🎊] ${player.name} inició un sorteo para el primero que adivine la palabra!`,
-          null,
-          0x00ff98,
-          "bold"
-        );
-      } else if (args[0] == "setprefix" && args.length > 1) {
+          sendAnnounce(
+            `[🎊] ${player.name} inició un sorteo para el primero que adivine la palabra!`,
+            null,
+            0x00ff98,
+            "bold"
+          );
+        } else if (args[0] == "setprefix" && args.length > 1) {
           if (giveawayTime) return;
 
           const checkAccess = await statsDB.findOne({ name: player.name });
@@ -1650,34 +1651,34 @@ haxball.then(async (HBInit) => {
             0x00ff98,
             "bold"
           );
-      } else if (args[0] == "chatlock" && player.admin) {
-        if (chatLocked) {
-          chatLocked = false;
+        } else if (args[0] == "chatlock" && player.admin) {
+          if (chatLocked) {
+            chatLocked = false;
+            sendAnnounce(
+              `[🔓] ${player.name} desbloqueó el chat!`,
+              null,
+              0x00ff98,
+              "bold"
+            );
+            return false;
+          }
+          chatLocked = true;
           sendAnnounce(
-            `[🔓] ${player.name} desbloqueó el chat!`,
+            `[🔒] ${player.name} bloqueó el chat!`,
             null,
             0x00ff98,
             "bold"
           );
-          return false;
-        }
-        chatLocked = true;
-        sendAnnounce(
-          `[🔒] ${player.name} bloqueó el chat!`,
-          null,
-          0x00ff98,
-          "bold"
-        );
-      } else if (args[0] == "reiniciarpalabra" && player.admin) {
-        adivinaTime = false;
-      } else if (args[0] == "claimcoins") {
-        sendAnnounce(
-          `[🪙] ${player.name} para reclamar las 200 coins gratis hace lo siguiente:\n- Entra al servidor de discord de la comunidad (discord.gg/WhjqRXMdju).\n- Usa el comando '/synchax' y vincula tu cuenta de discord con haxball.\n- Una vez vinculado usa '/claimcoins' en discord y se te van a depositar automaticamente las 200 coins!`,
-          player.id,
-          0x00ff98,
-          "small-bold"
-        );
-      } else if (args[0] == "gigante") {
+        } else if (args[0] == "reiniciarpalabra" && player.admin) {
+          adivinaTime = false;
+        } else if (args[0] == "claimcoins") {
+          sendAnnounce(
+            `[🪙] ${player.name} para reclamar las 200 coins gratis hace lo siguiente:\n- Entra al servidor de discord de la comunidad (discord.gg/WhjqRXMdju).\n- Usa el comando '/synchax' y vincula tu cuenta de discord con haxball.\n- Una vez vinculado usa '/claimcoins' en discord y se te van a depositar automaticamente las 200 coins!`,
+            player.id,
+            0x00ff98,
+            "small-bold"
+          );
+        } else if (args[0] == "gigante") {
           let poderesData = await poderesDB.findOne({ name: player.name });
 
           if (!poderesData || poderesData.gigante <= 0) return;
@@ -1702,7 +1703,7 @@ haxball.then(async (HBInit) => {
               "small-bold"
             );
           }, 8000);
-      } else if (args[0] == "powershot") {
+        } else if (args[0] == "powershot") {
           let poderesData = await poderesDB.findOne({ name: player.name });
           if (!poderesData || poderesData.power <= 0) return;
 
@@ -1714,10 +1715,8 @@ haxball.then(async (HBInit) => {
             "small-bold"
           );
           sendAnnounce(
-            `[🦍] ${
-              player.name
-            } Tenes 5 segundos para usar el powershot, te quedan (${
-              poderesData.power - 1
+            `[🦍] ${player.name
+            } Tenes 5 segundos para usar el powershot, te quedan (${poderesData.power - 1
             }) usos!`,
             player.id,
             0x00ff98,
@@ -1736,7 +1735,7 @@ haxball.then(async (HBInit) => {
             );
             room.setPlayerDiscProperties(player.id, { bCoeff: 0 });
           }, 5000);
-      } else if (args[0] == "todoschiquitos") {
+        } else if (args[0] == "todoschiquitos") {
           let poderesData = await poderesDB.findOne({ name: player.name });
           if (!poderesData || poderesData.todosChiquitos <= 0) return;
 
@@ -1756,8 +1755,7 @@ haxball.then(async (HBInit) => {
               "small-bold"
             );
             sendAnnounce(
-              `[👦] ${player.name} Te quedan (${
-                poderesData.todosChiquitos - 1
+              `[👦] ${player.name} Te quedan (${poderesData.todosChiquitos - 1
               }) usos!`,
               player.id,
               0x00ff98,
@@ -1793,8 +1791,7 @@ haxball.then(async (HBInit) => {
               "small-bold"
             );
             sendAnnounce(
-              `[👦] ${player.name} Te quedan (${
-                poderesData.todosChiquitos - 1
+              `[👦] ${player.name} Te quedan (${poderesData.todosChiquitos - 1
               }) usos!`,
               player.id,
               0x00ff98,
@@ -1817,10 +1814,10 @@ haxball.then(async (HBInit) => {
               );
             }, 25000);
           }
-      } 
-    }
-    commands();
-    return false;
+        }
+      }
+      commands();
+      return false;
     } else if (msg.startsWith("-") && player.admin) {
       let args = msg.split(" ");
       let messageAdmin = args.slice(1).join(" ");
@@ -2367,6 +2364,48 @@ haxball.then(async (HBInit) => {
     // Creado por rana (Discord: 17pxy)
   };
 
+  room.onPlayerActivity = function (player) {
+    const foundPlayer = playersInfo.find((p) => p.id === player.id)
+
+    if (foundPlayer) {
+      foundPlayer.playerActivity = Date.now();
+    }
+  };
+
+  room.onPlayerTeamChange = function (changedPlayer, byPlayer) {
+    const foundPlayer = playersInfo.find((p) => p.id === changedPlayer.id)
+    foundPlayer.playerActivity = Date.now();
+  }
+
+  room.onGameTick = function () {
+    checkIfAfk();
+  }
+  
+  function checkIfAfk() {
+    const AFK_KICK_TIME = 30 * 1000; // A los 30 segundos lo kickea
+    const AFK_WARNING_TIME = 15 * 1000 // A los 15 segundos da un aviso 
+    const now = Date.now();
+    playersInfo.forEach(player => {
+      const playerObj = room.getPlayer(player.id)
+
+      if (playerObj.team === 0) return;
+
+      if (Math.abs(player.playerActivity - now) > AFK_KICK_TIME) {
+        room.kickPlayer(player.id, `Fuiste kickeado por AFK.`);
+      }
+
+      else if (Math.abs(player.playerActivity - now) > AFK_WARNING_TIME && !player.warned) {
+        room.sendAnnouncement(
+          `[❗] ¡Si no te mueves en 15 segundos, serás kickeado por AFK!`,
+          player.id,
+          0xff0000,
+          "bold",
+          2
+        );
+        player.warned = true;
+      }
+    });
+  }
 
   const anunDisc = [
     "[❗] Entra a nuestro servidor de discord para recibir todas las novedades sobre la comunidad!",
@@ -2432,7 +2471,7 @@ haxball.then(async (HBInit) => {
     "haxballelmejorjuegoq",
     "aguanteelhaxball",
   ];
-  
+
   setInterval(() => {
     const indiceAleatorio = Math.floor(Math.random() * palabras.length);
     const palabraAleatoria = palabras[indiceAleatorio];
@@ -2526,7 +2565,7 @@ haxball.then(async (HBInit) => {
     }
     room.sendAnnouncement(msg, user, color, style, sound);
   }
-    // Creado por rana (Discord: 17pxy)
+  // Creado por rana (Discord: 17pxy)
   async function kickUser(user, razon, ban) {
     if (!isNaN(user)) return;
     room.kickPlayer(user, razon, ban);
@@ -2565,6 +2604,21 @@ haxball.then(async (HBInit) => {
       0
     );
   }
+
+  function secondsToMinutes(time) {
+    var hrs = ~~(time / 3600);
+    var mins = ~~((time % 3600) / 60);
+    var secs = ~~time % 60;
+
+    var ret = "";
+    if (hrs > 0) {
+      ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+    }
+    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+    ret += "" + secs;
+    return ret;
+  }
+
 });
 
 client.login(config.TOKEN);
